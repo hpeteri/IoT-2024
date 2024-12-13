@@ -4,45 +4,56 @@ from time import sleep
 import network
 import socket
 import machine
-import config
+import config.config
+import urequests
 
 #network
-ssid = config.ssid
-password = config.password
-
-#connection
-def connect():
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    wlan.connect(ssid, password)
-    while wlan.isconnected() == False:
-        print("Odottaa yhteyttä")
-        sleep(1)
-    ip = wlan.ifconfig()[0]
-    print(f'Connected on {ip}')
-    return ip
+ssid = config.config.ssid
+password = config.config.password
 
 #busss
-i2c = I2C(0, scl=Pin(1), sda=Pin(0))	
+i2c = I2C(0, scl=Pin(1), sda=Pin(0))
 
 
 bmp = BMP280(i2c, addr=0x76, use_case=BMP280_CASE_HANDHELD_DYN)
 
 
-def send_data(data):
-    address = socket.getaddrinfo(config.server, config.port)[0][-1]
-    s = socket.socket()
-    s.connect(address)
-    s.send(data)
-    s.close()
+#connect
 
-ip = connect()
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect(ssid, password)
+while True:
+    if wlan.status() == 3: # connected
+        print('[INFO] CONNECTED!')
+        network_info = wlan.ifconfig()
+        print('[INFO] IP address:', network_info[0])
+        break
+    print('Waiting for Wi-Fi connection...')
+    sleep(1)
+        
+
+address = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
+s = socket.socket()
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s.bind(address)
+s.listen(1)
+print('Kuunnellaan: ', address)
+
+
+
 
 while True:
+    
     temperature = bmp.temperature   
-    pressure = bmp.pressure
+    
+    url = "http://192.168.0.118:5000/post"
+    data = {"temp":temperature}
+    response = urequests.post(url, data=data)
+    print(response)
+    print(response.content)
+    print(response.text)
 
-    print("Temperature: {:.2f} °C".format(temperature))
-    print("Pressure: {:.2f} hPa".format(pressure))
+    response.close()
 
     sleep(1)
