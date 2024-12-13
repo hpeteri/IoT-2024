@@ -1,59 +1,25 @@
-from machine import Pin, I2C
-from bmp280 import *
-from time import sleep
-import network
-import socket
-import machine
-import config.config
-import urequests
+import os
+import sqlite3
+import time
+from flask import Flask, request # type: ignore
 
-#network
-ssid = config.config.ssid
-password = config.config.password
+app = Flask(__name__)
 
-#busss
-i2c = I2C(0, scl=Pin(1), sda=Pin(0))
+#sql db setup
+connection = sqlite3.connect("bmp280data.db")
+cursor = connection.cursor()
+cursor.execute("CREATE TABLE if not exists temperature(time, value)")
 
+#simple post data base adder
+@app.route("/post", methods=["POST"])
+def posting():
+    temp = request.args.get("temp")
+    print(temp)
+    return f"Query Param Name: {temp}", 200
 
-bmp = BMP280(i2c, addr=0x76, use_case=BMP280_CASE_HANDHELD_DYN)
+@app.route("/")
+def test():
+    return "<h1>Hello World!</h1>"
 
-
-#connect
-
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
-wlan.connect(ssid, password)
-while True:
-    if wlan.status() == 3: # connected
-        print('[INFO] CONNECTED!')
-        network_info = wlan.ifconfig()
-        print('[INFO] IP address:', network_info[0])
-        break
-    print('Waiting for Wi-Fi connection...')
-    sleep(1)
-        
-
-address = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
-s = socket.socket()
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind(address)
-s.listen(1)
-print('Kuunnellaan: ', address)
-
-
-
-
-while True:
-    
-    temperature = bmp.temperature   
-    
-    url = "http://192.168.0.118:5000/post"
-    data = {"temp":temperature}
-    response = urequests.post(url, data=data)
-    print(response)
-    print(response.content)
-    print(response.text)
-
-    response.close()
-
-    sleep(1)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
