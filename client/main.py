@@ -47,7 +47,7 @@ while True:
 
     temperature = bmp.temperature
 
-    url = "http://192.168.0.1:5000/post"
+    url = "http://192.168.0.1:5000/temperature"
     data = {"temp":temperature}
     response = requests.post(url)
     print(response)
