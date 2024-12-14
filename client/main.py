@@ -5,7 +5,7 @@ import network
 import socket
 import machine
 import config.config
-import urequests
+import requests
 
 #network
 ssid = config.config.ssid
@@ -47,9 +47,9 @@ while True:
 
     temperature = bmp.temperature
 
-    url = "http://192.168.0.118:5000/post"
+    url = "http://192.168.0.1:5000/post"
     data = {"temp":temperature}
-    response = urequests.post(url, data=data)
+    response = requests.post(url)
     print(response)
     print(response.content)
     print(response.text)
