@@ -50,7 +50,7 @@ def route_post_temperature():
 
 @app.route("/")
 def route_default():
-    return "<h1>Hello World!</h1>"
+    return "<h1>Server is running!</h1>"
 
 if __name__ == "__main__":
     cleanup_thread = threading.Thread(target=threadproc_cleanup_old_records, daemon=True)
