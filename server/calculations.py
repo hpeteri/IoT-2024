@@ -1,8 +1,8 @@
 import sqlite3
-
+from server_config import DB_FILE
 
 def rise_check():
-    connection = sqlite3.connect("sensor_data.db")
+    connection = sqlite3.connect(DB_FILE)
     cursor = connection.cursor()
 
     #row fetch
