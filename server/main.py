@@ -7,6 +7,7 @@ import threading
 from cleanup import threadproc_cleanup_old_records
 from server_config import DB_FILE
 import traceback
+from calculations import rise_check
 
 app = Flask(__name__)
 

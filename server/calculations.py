@@ -1,5 +1,6 @@
 import sqlite3
 from server_config import DB_FILE
+from datetime import datetime, timedelta
 
 def rise_check():
     connection = sqlite3.connect(DB_FILE)
@@ -20,9 +21,15 @@ def rise_check():
     print(f"Vikat rivit: {last_digits}")
 
     try:
+        time1 = datetime.strptime(last_digits[0][0], "%Y-%m-%d %H:%M:%S")
+        time2 = datetime.strptime(last_digits[1][0], "%Y-%m-%d %H:%M:%S")
         temp1 = float(last_digits[0][1])  
         temp2 = float(last_digits[1][1])  
     except:
+        return False
+
+    time_diff = time2 - time1
+    if time_diff > timedelta(hours=1):
         return False
 
     print(f"Check: {temp1} -> {temp2}")
@@ -30,6 +37,9 @@ def rise_check():
         return True
     else:
         return False
+    
+def is_brewing():
+    return None
 
 
 if rise_check():
