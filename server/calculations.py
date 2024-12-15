@@ -20,8 +20,8 @@ def rise_check():
     print(f"Vikat rivit: {last_digits}")
 
     try:
-        temp1 = float(last_digits[0][1])  
-        temp2 = float(last_digits[1][1])  
+        temp1 = float(last_digits[0][1])
+        temp2 = float(last_digits[1][1])
     except:
         return False
 
