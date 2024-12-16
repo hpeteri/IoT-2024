@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import time
-from flask import Flask, request # type: ignore
+from flask import Flask, request
 import json
 import threading
 from cleanup import threadproc_cleanup_old_records
@@ -26,7 +26,7 @@ def route_post_temperature():
         connection = sqlite3.connect(DB_FILE)
         cursor = connection.cursor()
 
-        t_value = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        t_value = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
         tmp_value = temp["temp"]
 
         try:
@@ -49,6 +49,44 @@ def route_post_temperature():
         return f"Bad Request", 400
 
 
+@app.route("/temperature", methods=["GET"])
+def route_get_temperature():
+
+    """
+    @brief data end point to query 50 latest temperature data points
+    @return json [{"time": "%Y-%m-%d %H:%M:%S", "value": <float>}]
+    """
+
+    sql = """
+    SELECT *
+    FROM temperature
+    ORDER BY time DESC
+    LIMIT 50
+    ;
+    """
+
+    try:
+        connection = sqlite3.connect(DB_FILE)
+        cursor = connection.cursor()
+        cursor.execute(sql)
+
+        records = cursor.fetchall()
+
+        columns = [description[0] for description in cursor.description]
+        connection.close()
+
+        for record in records:
+            print(record)
+
+        data = [dict(zip(columns, row)) for row in records]
+
+        return json.dumps(data), 200
+
+    except Exception as e:
+        print(f"Error during GET temperature. {e}")
+        print(traceback.format_exc())
+        return "Bad Request", 400
+
 @app.route("/")
 def route_default():
     return "<h1>Server is running!</h1>"
@@ -57,4 +95,7 @@ if __name__ == "__main__":
     cleanup_thread = threading.Thread(target=threadproc_cleanup_old_records, daemon=True)
     cleanup_thread.start()
 
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    try:
+        app.run(host="0.0.0.0", port=5000, debug=True)
+    except Exception as e:
+        print(e)

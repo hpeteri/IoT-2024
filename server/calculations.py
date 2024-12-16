@@ -23,8 +23,8 @@ def rise_check():
     try:
         time1 = datetime.strptime(last_digits[0][0], "%Y-%m-%d %H:%M:%S")
         time2 = datetime.strptime(last_digits[1][0], "%Y-%m-%d %H:%M:%S")
-        temp1 = float(last_digits[0][1])  
-        temp2 = float(last_digits[1][1])  
+        temp1 = float(last_digits[0][1])
+        temp2 = float(last_digits[1][1])
     except:
         return False
 
@@ -37,7 +37,7 @@ def rise_check():
         return True
     else:
         return False
-    
+
 def is_brewing():
     return None
 
