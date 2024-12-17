@@ -87,6 +87,12 @@ def route_get_temperature():
         print(traceback.format_exc())
         return "Bad Request", 400
 
+@app.route("/brewing", methods=["GET"])
+def route_get_brewing_status():
+    if random.random() > 0.5:
+        return False, 200
+    return True, 200
+
 @app.route("/")
 def route_default():
     return "<h1>Server is running!</h1>"
