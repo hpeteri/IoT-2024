@@ -7,7 +7,11 @@ def rise_check():
     cursor = connection.cursor()
 
     #row fetch
-    cursor.execute("SELECT time, value FROM temperature ORDER BY time ASC")
+    try:
+        cursor.execute("SELECT time, value FROM temperature ORDER BY time ASC")
+    except:
+        return False
+
     rows = cursor.fetchall()
     connection.close()
 
