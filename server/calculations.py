@@ -2,6 +2,7 @@ import sqlite3
 from server_config import DB_FILE
 from datetime import datetime, timedelta
 
+
 def rise_check():
     connection = sqlite3.connect(DB_FILE)
     cursor = connection.cursor()
@@ -41,8 +42,3 @@ def rise_check():
 def is_brewing():
     return None
 
-
-if rise_check():
-    print("rise flag")
-else:
-    print("nope")
