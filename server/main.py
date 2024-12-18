@@ -114,7 +114,7 @@ def route_get_brewing_status():
         print(f"/brewing got {len(records)} records")
 
         for record in records:
-            if float(record) >= prev:
+            if float(record[0]) >= prev:
                 count += 1
 
         if count > len(records) / 2 and count != 0:
@@ -147,7 +147,7 @@ def route_get_ready_status():
         count = 0
         print(f"/ready got {len(records)} records")
         for record in records:
-            if float(record) > 35:
+            if float(record[0]) > 35:
                 count += 1
 
         if count > len(records) / 2 and count != 0:
