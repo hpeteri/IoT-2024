@@ -8,6 +8,7 @@ from cleanup import threadproc_cleanup_old_records
 from server_config import DB_FILE
 import traceback
 from calculations import rise_check
+import random
 
 app = Flask(__name__)
 
@@ -90,8 +91,8 @@ def route_get_temperature():
 @app.route("/brewing", methods=["GET"])
 def route_get_brewing_status():
     if random.random() > 0.5:
-        return False, 200
-    return True, 200
+        return json.dumps({"status": False}), 200
+    return json.dumps({"status": True}), 200
 
 @app.route("/")
 def route_default():
