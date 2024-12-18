@@ -117,6 +117,9 @@ def route_get_brewing_status():
             if float(record[0]) >= prev:
                 count += 1
 
+        print(f"/brewing {count} / {len(records)}")
+        print(records)
+
         if count > len(records) / 2 and count != 0:
             return json.dumps({"value": True}), 200
         else:
@@ -149,6 +152,9 @@ def route_get_ready_status():
         for record in records:
             if float(record[0]) > 35:
                 count += 1
+
+        print(f"/ready {count} / {len(records)}")
+        print(records)
 
         if count > len(records) / 2 and count != 0:
             return json.dumps({"value": True}), 200
