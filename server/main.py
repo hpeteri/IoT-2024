@@ -105,7 +105,7 @@ def route_get_brewing_status():
 
         prev = 0
         if len(records):
-            prev = float(records[0]["temperature"])
+            prev = float(records[0][0])
 
         count = 0
 
