@@ -90,9 +90,72 @@ def route_get_temperature():
 
 @app.route("/brewing", methods=["GET"])
 def route_get_brewing_status():
-    if random.random() > 0.5:
-        return json.dumps({"status": False}), 200
-    return json.dumps({"status": True}), 200
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        delete_query = f"""
+        SELECT *
+        FROM temperature
+        WHERE time < DATETIME('now', '-10 seconds');
+        """
+        cursor.execute(delete_query)
+        conn.commit()
+
+        records = cursor.fetchall()
+
+        prev = float(records[0]["temperature"])
+
+        count = 0
+
+        connection.close()
+
+        for record in records:
+            if float(record["temperature"]) >= prev:
+                count += 1
+
+        if count > len(records) / 2 and count != 0:
+            return json.dumps({"value": True}), 200
+        else:
+            return json.dumps({"value": False}), 200
+
+    except Exception as e:
+        print(f"Error during GET /ready: {e}")
+
+    return json.dumps({"value": False}), 200
+
+@app.route("/ready", methods=["GET"])
+def route_get_ready_status():
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        delete_query = f"""
+        SELECT *
+        FROM temperature
+        WHERE time < DATETIME('now', '-6 minutes');
+        """
+        cursor.execute(delete_query)
+        conn.commit()
+
+        records = cursor.fetchall()
+
+        connection.close()
+
+        count = 0
+        for record in records:
+            if float(record["temperature"]) > 35:
+                count += 1
+
+        if count > len(records) / 2 and count != 0:
+            return json.dumps({"value": True}), 200
+
+        else:
+            return json.dumps({"value": False}), 200
+
+    except Exception as e:
+        print(f"Error during GET /ready: {e}")
+
+
+    return json.dumps({"value": False}), 200
 
 @app.route("/")
 def route_default():
