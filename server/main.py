@@ -94,7 +94,7 @@ def route_get_brewing_status():
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
         delete_query = f"""
-        SELECT *
+        SELECT value
         FROM temperature
         WHERE time < DATETIME('now', '-10 seconds');
         """
@@ -103,14 +103,18 @@ def route_get_brewing_status():
 
         records = cursor.fetchall()
 
-        prev = float(records[0]["temperature"])
+        prev = 0
+        if len(records):
+            prev = float(records[0]["temperature"])
 
         count = 0
 
-        connection.close()
+        conn.close()
+
+        print(f"/brewing got {len(records)} records")
 
         for record in records:
-            if float(record["temperature"]) >= prev:
+            if float(record) >= prev:
                 count += 1
 
         if count > len(records) / 2 and count != 0:
@@ -129,7 +133,7 @@ def route_get_ready_status():
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
         delete_query = f"""
-        SELECT *
+        SELECT value
         FROM temperature
         WHERE time < DATETIME('now', '-6 minutes');
         """
@@ -138,11 +142,12 @@ def route_get_ready_status():
 
         records = cursor.fetchall()
 
-        connection.close()
+        conn.close()
 
         count = 0
+        print(f"/ready got {len(records)} records")
         for record in records:
-            if float(record["temperature"]) > 35:
+            if float(record) > 35:
                 count += 1
 
         if count > len(records) / 2 and count != 0:
