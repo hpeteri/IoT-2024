@@ -6,6 +6,8 @@ import socket
 import machine
 import config.config
 import requests
+import json
+
 
 #network
 ssid = config.config.ssid
@@ -31,7 +33,7 @@ while True:
         break
     print('Waiting for Wi-Fi connection...')
     sleep(1)
-
+        
 
 address = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
 s = socket.socket()
@@ -46,14 +48,22 @@ print('Kuunnellaan: ', address)
 while True:
 
     temperature = bmp.temperature
-
-    url = "http://192.168.0.1:5000/temperature"
-    data = {"temp":temperature}
-    response = requests.post(url)
+    
+    
+    print(temperature)
+    
+    
+    
+    data = {"temp": temperature}
+    
+    url = "http://130.231.14.3:5000/temperature"
+    print(json.dumps(data))
+    response = requests.post(url, data=json.dumps(data))
     print(response)
     print(response.content)
     print(response.text)
 
     response.close()
 
-    sleep(1)
+    sleep(3)
+    
