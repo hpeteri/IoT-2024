@@ -96,7 +96,7 @@ def route_get_brewing_status():
         delete_query = f"""
         SELECT value
         FROM temperature
-        WHERE time < DATETIME('now', '-10 seconds');
+        WHERE time > DATETIME('now', '-60 seconds');
         """
         cursor.execute(delete_query)
         conn.commit()
@@ -114,7 +114,7 @@ def route_get_brewing_status():
         print(f"/brewing got {len(records)} records")
 
         for record in records:
-            if float(record[0]) >= prev:
+            if float(record[0]) >= prev and float(record[0]) > 29:
                 count += 1
 
         print(f"/brewing {count} / {len(records)}")
@@ -138,7 +138,7 @@ def route_get_ready_status():
         delete_query = f"""
         SELECT value
         FROM temperature
-        WHERE time < DATETIME('now', '-6 minutes');
+        WHERE time > DATETIME('now', '-1 minutes');
         """
         cursor.execute(delete_query)
         conn.commit()
@@ -150,13 +150,13 @@ def route_get_ready_status():
         count = 0
         print(f"/ready got {len(records)} records")
         for record in records:
-            if float(record[0]) > 35:
+            if float(record[0]) > 29:
                 count += 1
 
         print(f"/ready {count} / {len(records)}")
         print(records)
 
-        if count > len(records) / 2 and count != 0:
+        if count > len(records) / 3 and count != 0:
             return json.dumps({"value": True}), 200
 
         else:
